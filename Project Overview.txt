@@ -1,0 +1,192 @@
+Project Overview
+
+We want a polished WordPress plugin that adds a floating chatbot to every page. The chatbot serves two purposes:
+
+Chat with an AI assistant that answers questions about the website based on uploaded documentation and recent posts/pages.
+
+Record voice messages for the site owner without transcribing them; the admin can download these recordings later.
+
+An admin settings page will manage email notifications, documentation uploads, colour/theme settings, conversation logs with analytics, and conversation analysis.
+
+Task List
+Phase 1: Foundation
+
+Set up the plugin structure
+
+Create the plugin directory and main PHP file with proper metadata.
+
+Define hooks for activation/deactivation if needed.
+
+Register a settings page under “Settings → Site Assistant.”
+
+Implement base REST API endpoints
+
+/chat for assistant queries.
+
+/voice for uploading voice recordings.
+
+/stats for tracking usage (chat, voice, feedback).
+
+/save_conversation for logging chat histories.
+
+/analyze_conversation for summarising a single conversation.
+
+/analyze_all_conversations to summarise all conversations in aggregate.
+
+Set up JavaScript and CSS placeholders
+
+Enqueue separate JS and CSS files on the front-end.
+
+Localise the REST endpoints and any dynamic settings (e.g., colours, document names).
+
+Phase 2: Front‑End Interface
+
+Design the floating chat bubble
+
+Position a small, round button in the lower corner of every page.
+
+Clicking the bubble should toggle a modal (or slide-out) chat interface.
+
+Build the modal UI
+
+Header with site‑assistant title, close button, and dark‑mode toggle.
+
+Tab bar with “Chat” and “Leave Message” tabs.
+
+Chat tab:
+
+Scrollable messages area for conversation history.
+
+Input area with multi-line text, send button, voice input button (using Web Speech API), and a clear button.
+
+Leave‑Message tab:
+
+Buttons to start/stop recording via the MediaRecorder API.
+
+Status indicator for recording and sending progress.
+
+Style the interface
+
+Use CSS variables for primary and accent colours.
+
+Make dark mode available (via class toggle).
+
+Ensure messages wrap correctly, scrollbars appear, and controls are clearly visible in all themes.
+
+Test on mobile and desktop to ensure responsiveness.
+
+Phase 3: Assistant Interaction
+
+Implement chat functionality
+
+Capture user input and append to the chat history.
+
+Build a request payload including:
+
+A system prompt describing the assistant role.
+
+Uploaded documentation text (RAG).
+
+Excerpts of recent posts and pages (e.g., titles plus ~400 characters).
+
+Conversation history.
+
+Send the payload to the specified completions endpoint (/azurechat/v1/completions).
+
+Display the assistant’s reply and store it in conversation history.
+
+Persist conversation in localStorage so users can continue where they left off.
+
+Add speech recognition
+
+Use the Web Speech API if available to transcribe user questions.
+
+Insert the transcribed text into the input and send it automatically.
+
+Add feedback buttons
+
+After each assistant reply, show thumbs up/down icons.
+
+Record feedback locally and send a stats event to WordPress.
+
+Phase 4: Voice Message Feature
+
+Record and send voice messages
+
+On the “Leave Message” tab, request microphone access.
+
+Start/stop recording with MediaRecorder; gather audio chunks.
+
+Convert to a Base64 data URL and send to /voice.
+
+Store recordings in the uploads directory and log metadata.
+
+Email the admin with the recording link and (optionally) a transcript if the browser provided it.
+
+Add a feedback message to inform the user that their recording was sent.
+
+List and manage voice messages
+
+In the settings page, show a table of recorded messages with dates and download links.
+
+Provide checkboxes to delete selected recordings.
+
+Phase 5: Admin Settings & Analytics
+
+Admin settings page
+
+Add fields for admin email, primary and accent colours.
+
+Allow multiple document uploads (txt, md, html, pdf). Strip HTML tags and, for PDFs, note that extraction may be minimal.
+
+Display uploaded document names in a list with delete checkboxes, so the admin knows what has been uploaded.
+
+Show usage analytics (total chat messages, voice messages, thumbs up/down).
+
+Conversation logging and analysis
+
+Save each conversation (excluding the welcome message) to the database via /save_conversation.
+
+Display saved conversations in a table with date, preview (first ~80 chars), and:
+
+Checkbox to delete.
+
+An “Analyze” button to summarise each conversation.
+
+Implement “Analyze All Conversations” to aggregate all logs and request global suggestions via the ChatGPT endpoint.
+
+Display summaries inline beneath the button or in a modal popup.
+
+Ensure error handling
+
+Display meaningful messages if remote API calls fail.
+
+Truncate transcripts to safe lengths before sending to avoid exceeding token limits.
+
+Provide fallbacks if voice recording or speech recognition is unavailable in the browser.
+
+Phase 6: Additional Enhancements (Optional)
+
+Custom theming: Allow the admin to upload a logo or choose fonts.
+
+Welcome or proactive prompts: Auto-expand or show a greeting after a delay to engage visitors.
+
+Analytics dashboard: Show charts or graphs of usage over time.
+
+Multilingual support: Detect user’s language and translate interactions accordingly.
+
+Webhook integration: Send voice recordings to a CRM or helpdesk.
+
+User feedback reports: Aggregate thumbs up/down and surface common questions.
+
+Execution Guidance
+
+Develop iteratively: After each phase or subtask, test thoroughly in both light and dark modes and on different devices.
+
+Prioritise clarity: Keep the UI simple and intuitive; avoid clutter.
+
+Ask for time: If you encounter a complex problem (e.g., cross‑browser audio handling, API rate limits), request more time to research and implement a robust solution rather than rushing.
+
+Document as you go: Comment your code, especially around REST endpoints and data handling, so future maintainers can understand it.
+
+By following this structured plan and checking each task against the requirements, you can build a high-quality site assistant plugin that is both user-friendly and administratively powerful.
