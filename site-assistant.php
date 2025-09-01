@@ -26,3 +26,33 @@ function site_assistant_init() {
     $plugin->init();
 }
 add_action('plugins_loaded', 'site_assistant_init');
+
+
+// Register activation and deactivation hooks
+register_activation_hook(__FILE__, 'site_assistant_activate');
+register_deactivation_hook(__FILE__, 'site_assistant_deactivate');
+
+/**
+ * Activation callback to create custom table for storing conversations.
+ */
+function site_assistant_activate() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'site_assistant_conversations';
+    $charset_collate = $wpdb->get_charset_collate();
+    require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+    $sql = "CREATE TABLE $table_name (
+        id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+        conversation LONGTEXT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        PRIMARY KEY  (id),
+        KEY created_at (created_at)
+    ) $charset_collate;";
+    dbDelta($sql);
+}
+
+/**
+ * Deactivation callback. Currently retains the custom table for future use.
+ */
+function site_assistant_deactivate() {
+    // Optionally clean up resources on deactivation.
+}
